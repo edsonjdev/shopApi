@@ -23,17 +23,16 @@ public class Provincia implements Serializable {
 	private String nome;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy="estado")
+	@OneToMany(mappedBy="provincia")
 	private List<Cidade> cidades = new ArrayList<>();
 
 	public Provincia() {
 	}
 
-	public Provincia(Integer id, String nome, List<Cidade> cidades) {
+	public Provincia(Integer id, String nome) {
 		super();
 		this.id = id;
 		this.nome = nome;
-		this.cidades = cidades;
 	}
 
 	public Integer getId() {

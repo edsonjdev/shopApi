@@ -1,15 +1,34 @@
 package com.edson.shop.service;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.edson.shop.domain.Categoria;
+import com.edson.shop.domain.Cidade;
+import com.edson.shop.domain.Cliente;
+import com.edson.shop.domain.Endereco;
+import com.edson.shop.domain.ItemPedido;
+import com.edson.shop.domain.Pagamento;
+import com.edson.shop.domain.PagamentoComBoleto;
+import com.edson.shop.domain.PagamentoComCartao;
+import com.edson.shop.domain.Pedido;
 import com.edson.shop.domain.Produto;
+import com.edson.shop.domain.Provincia;
+import com.edson.shop.domain.enums.EstadoPagamento;
+import com.edson.shop.domain.enums.TipoCliente;
 import com.edson.shop.repositories.CategoriaRepository;
+import com.edson.shop.repositories.CidadeRepository;
+import com.edson.shop.repositories.ClienteRepository;
+import com.edson.shop.repositories.EnderecoRepository;
+import com.edson.shop.repositories.ItemPedidoRepository;
+import com.edson.shop.repositories.PagamentoRepository;
+import com.edson.shop.repositories.PedidoRepository;
 import com.edson.shop.repositories.ProdutoRepository;
+import com.edson.shop.repositories.ProvinciaRepository;
 
 @Service
 public class DBService {
@@ -19,6 +38,27 @@ public class DBService {
 	
 	@Autowired
 	private ProdutoRepository produtoRepository; 
+	
+	@Autowired
+	ProvinciaRepository provinciaRepository;
+	
+	@Autowired
+	CidadeRepository cidadeRepository;
+	
+	@Autowired
+	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private EnderecoRepository enderecoRepository;
+	
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
+	
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 	
 	public void instantiateTestDatabase() throws ParseException {
 		
@@ -148,6 +188,66 @@ public class DBService {
 		produtoRepository.saveAll(Arrays.asList(p12, p13, p14, p15, p16, p17, p18, p19, p20,
 				p21, p22, p23, p24, p25, p26, p27, p28, p29, p30, p31, p32, p34, p35, p36, p37, p38,
 				p39, p40, p41, p42, p43, p44, p45, p46, p47, p48, p49, p50));
+		
+		Provincia prov1 = new Provincia(null, "Sofala");
+		Provincia prov2 = new Provincia(null, "Maputo");
+		
+		Cidade c1 = new Cidade(null, "Beira", prov1);
+		Cidade c2 = new Cidade(null, "Dondo", prov1);
+		Cidade c3 = new Cidade(null, "Maputo", prov2);
+		
+		prov1.getCidades().addAll(Arrays.asList(c1, c2));
+		prov2.getCidades().addAll(Arrays.asList(c3));
+		
+		provinciaRepository.saveAll(Arrays.asList(prov1, prov2));
+		cidadeRepository.saveAll(Arrays.asList(c1, c2, c3));
+		
+		Cliente cli1 = new Cliente(null, "Edson Joaquim", "edsonj.dev@gmail.com", TipoCliente.PESSOAFISICA, "123");
+		cli1.getTelefones().addAll(Arrays.asList("843018718", "826888618"));
+		
+		Cliente cli2 = new Cliente(null, "Allen Edson", "edsonjay53@gmail.com", TipoCliente.PESSOAFISICA, "123");
+		cli2.getTelefones().addAll(Arrays.asList("843333333", "82333332", "876888618"));
+		
+		Endereco end1 = new Endereco(null, "Manga", "Chingussura - Campo de futebol", cli1, c1);
+		Endereco end2 = new Endereco(null, "Dondo", "Bairro Residencial Cimentos de Mocambique - casa 12", cli2, c2);
+		
+		cli1.getEnderecos().addAll(Arrays.asList(end1));
+		cli2.getEnderecos().addAll(Arrays.asList(end2));
+		
+		clienteRepository.saveAll(Arrays.asList(cli1, cli2));
+		enderecoRepository.saveAll(Arrays.asList(end1, end2));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy HH:mm");
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("21/08/2020 19:06"), cli1, end1);
+		Pedido ped2 = new Pedido(null, sdf.parse("21/08/2020 19:06"), cli2, end2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.PENDENTE, ped1, 1);
+		ped1.setPagamento(pagto1);
+		
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("21/08/2020 19:24"), null);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1));
+		cli2.getPedidos().addAll(Arrays.asList(ped2));
+		
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
+		
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.0);
+		ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.0);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 80.00, 1, 1000.0);
+		
+		ped1.getItens().addAll(Arrays.asList(ip1, ip2));
+		ped2.getItens().addAll(Arrays.asList(ip3));
+		
+		p1.getItens().addAll(Arrays.asList(ip1));
+		p2.getItens().addAll(Arrays.asList(ip3));
+		p3.getItens().addAll(Arrays.asList(ip2));
+		
+		itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));
+		
+		
 		
 		
 	}
